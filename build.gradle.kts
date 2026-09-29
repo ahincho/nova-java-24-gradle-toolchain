@@ -63,6 +63,12 @@ subprojects {
         options.compilerArgs.addAll(listOf("-parameters", "-Xlint:all,-processing", "-Werror"))
     }
 
+    // Los plugins corren en la JVM que arranca Gradle, no en la del proyecto que compilan, así que salen
+    // para la mínima que soporta Gradle 9. Con 25, un build que arranca Gradle con Java 21 no los carga.
+    tasks.named<JavaCompile>("compileJava") {
+        options.release.set(17)
+    }
+
     tasks.withType<Jar>().configureEach {
         manifest {
             attributes("Implementation-Title" to project.name, "Implementation-Version" to project.version)
