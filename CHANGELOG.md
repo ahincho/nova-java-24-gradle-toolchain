@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.1.0](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v1.0.1...v1.1.0) (2026-09-29)
+
+
+### Features
+
+* add the library plugin ([e3651c3](https://github.com/ahincho/nova-java-24-gradle-toolchain/commit/e3651c3677e03ecfd299059ae951e3130495c2cf))
+* aggregate the SBOM at the root of a multi-module build ([25f0f99](https://github.com/ahincho/nova-java-24-gradle-toolchain/commit/25f0f99c88a740bc2f44d5e159999ad0bec6df5e))
+
 ## [1.0.1](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v1.0.0...v1.0.1) (2026-09-29)
 
 
