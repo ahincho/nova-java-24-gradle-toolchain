@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.0.1](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v1.0.0...v1.0.1) (2026-09-29)
+
+
+### Bug Fixes
+
+* print the commit hook messages in UTF-8 ([6110add](https://github.com/ahincho/nova-java-24-gradle-toolchain/commit/6110add4dc9661cedf32758e8d07dbb96a5b0f1a))
+
 ## 1.0.0 (2026-09-29)
 
 
