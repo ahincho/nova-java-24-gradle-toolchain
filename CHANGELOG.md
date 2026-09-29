@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.1.1](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v1.1.0...v1.1.1) (2026-09-29)
+
+
+### Bug Fixes
+
+* run the plugins on any JVM that Gradle 9 supports ([c0924b0](https://github.com/ahincho/nova-java-24-gradle-toolchain/commit/c0924b0b9abe436924834e2a03348b2dddba3ce6))
+
 ## [1.1.0](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v1.0.1...v1.1.0) (2026-09-29)
 
 
