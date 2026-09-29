@@ -1,0 +1,14 @@
+{
+  "packages": {
+    ".": {
+      "component": "nova-gradle-toolchain",
+      "package-name": "pe.edu.nova.java:nova-gradle-toolchain",
+      "release-type": "java",
+      "release-as": "2.0.0",
+      "include-component-in-tag": false,
+      "skip-snapshot": true,
+      "draft": false,
+      "prerelease": false
+    }
+  }
+}
