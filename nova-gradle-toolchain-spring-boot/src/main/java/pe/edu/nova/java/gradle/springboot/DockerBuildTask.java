@@ -5,10 +5,13 @@ import java.io.IOException;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.ArrayList;
+import java.util.List;
 import javax.inject.Inject;
 import org.gradle.api.DefaultTask;
 import org.gradle.api.GradleException;
 import org.gradle.api.file.RegularFileProperty;
+import org.gradle.api.provider.ListProperty;
 import org.gradle.api.provider.Property;
 import org.gradle.api.tasks.Input;
 import org.gradle.api.tasks.InputFile;
@@ -53,6 +56,16 @@ public abstract class DockerBuildTask extends DefaultTask {
     public abstract Property<String> getImage();
 
     /**
+     * Argumentos extra para el build, como {@code JAVA_VERSION=25} o la imagen base fijada por digest en
+     * {@code JAVA_IMAGE}. Lo que cambia por servicio va aquí, no como una edición del Dockerfile.
+     *
+     * @return la propiedad
+     */
+    @Input
+    @Option(option = "build-arg", description = "A build argument, such as JAVA_IMAGE=eclipse-temurin@sha256:...")
+    public abstract ListProperty<String> getBuildArgs();
+
+    /**
      * Dónde se escribe el Dockerfile de la plataforma antes de construir.
      *
      * @return la propiedad
@@ -79,17 +92,15 @@ public abstract class DockerBuildTask extends DefaultTask {
         } catch (IOException e) {
             throw new UncheckedIOException("nova: no se pudo escribir " + dockerfile, e);
         }
+        List<String> command = new ArrayList<>(List.of(
+                "docker", "build", "--file", dockerfile.getAbsolutePath(), "--build-arg", "JAR_FILE=" + jar.getName()));
+        for (String buildArg : getBuildArgs().get()) {
+            command.add("--build-arg");
+            command.add(buildArg);
+        }
+        command.addAll(List.of("--tag", getImage().get(), jar.getParentFile().getAbsolutePath()));
         ExecResult result = getExec().exec(spec -> {
-            spec.commandLine(
-                    "docker",
-                    "build",
-                    "--file",
-                    dockerfile.getAbsolutePath(),
-                    "--build-arg",
-                    "JAR_FILE=" + jar.getName(),
-                    "--tag",
-                    getImage().get(),
-                    jar.getParentFile().getAbsolutePath());
+            spec.commandLine(command);
             spec.setIgnoreExitValue(true);
         });
         if (result.getExitValue() != 0) {

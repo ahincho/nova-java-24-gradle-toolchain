@@ -140,8 +140,15 @@ repositorio.
 ```bash
 ./gradlew novaDocker
 ./gradlew novaDocker --tag=plaza-orders:dev
+./gradlew novaDocker --build-arg=JAVA_IMAGE=eclipse-temurin@sha256:...
 ./gradlew novaDockerEject
 ```
+
+Es una sola imagen para todos los ambientes: el ambiente llega como variable de entorno al arrancar,
+así que lo que se probó en dev es lo que llega a prod. Expone el puerto 8080, la convención de los
+servicios Java, y arranca con `java` como PID 1 para que el `SIGTERM` del orquestador dispare el
+apagado ordenado. La imagen base es un argumento, para fijarla por digest: un tag cambia con el
+tiempo, y dos builds del mismo commit podrían dar imágenes distintas.
 
 El build corre fuera de Docker y la imagen solo copia el jar, así que no necesita el token del
 registro. `novaDockerEject` escribe el Dockerfile con un encabezado que dice de dónde salió, y nunca

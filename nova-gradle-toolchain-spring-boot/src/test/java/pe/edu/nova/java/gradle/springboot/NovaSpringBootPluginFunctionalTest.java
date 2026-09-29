@@ -60,7 +60,7 @@ class NovaSpringBootPluginFunctionalTest {
         run("novaDockerEject");
 
         List<String> lines = read("Dockerfile").lines().toList();
-        assertThat(lines.get(0)).isEqualTo("# syntax=docker/dockerfile:1");
+        assertThat(lines.get(0)).isEqualTo("# syntax=docker/dockerfile:1.7");
         assertThat(lines.get(1)).startsWith("# Escrito por novaDockerEject");
         assertThat(read("Dockerfile")).contains(NovaDockerfile.MARKER).contains("USER 10001:10001");
     }
@@ -136,8 +136,11 @@ class NovaSpringBootPluginFunctionalTest {
         assumeTrue(docker("info") == 0, "Docker is not available");
         String image = "nova-toolchain-test/sample:" + System.nanoTime();
         try {
-            run("novaDocker", "--tag=" + image);
+            run("novaDocker", "--tag=" + image, "--build-arg=JAVA_VERSION=25");
             assertThat(docker("image", "inspect", image)).isZero();
+            assertThat(dockerOutput("image", "inspect", "--format", "{{.Config.User}} {{.Config.ExposedPorts}}", image))
+                    .contains("10001:10001")
+                    .contains("8080/tcp");
         } finally {
             docker("rmi", "--force", image);
         }
@@ -169,6 +172,15 @@ class NovaSpringBootPluginFunctionalTest {
         Process process = new ProcessBuilder(command).redirectErrorStream(true).start();
         process.getInputStream().readAllBytes();
         return process.waitFor();
+    }
+
+    private static String dockerOutput(String... arguments) throws IOException, InterruptedException {
+        List<String> command = new java.util.ArrayList<>(List.of("docker"));
+        command.addAll(List.of(arguments));
+        Process process = new ProcessBuilder(command).redirectErrorStream(true).start();
+        String output = new String(process.getInputStream().readAllBytes(), StandardCharsets.UTF_8);
+        process.waitFor();
+        return output;
     }
 
     private void write(String path, String content) {

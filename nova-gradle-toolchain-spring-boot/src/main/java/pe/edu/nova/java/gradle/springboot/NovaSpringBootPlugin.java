@@ -65,6 +65,7 @@ public class NovaSpringBootPlugin implements Plugin<Project> {
             task.dependsOn(bootJar);
             task.getJar().set(bootJar.flatMap(BootJar::getArchiveFile));
             task.getImage().convention(project.getName() + ":" + project.getVersion());
+            task.getBuildArgs().convention(List.of());
             task.getDockerfile().set(project.getLayout().getBuildDirectory().file("nova-docker/Dockerfile"));
         });
         project.getTasks().register("novaDockerEject", DockerEjectTask.class, task -> {
