@@ -8,8 +8,8 @@ dependencies {
 gradlePlugin {
     plugins {
         create("novaSpringBoot") {
-            // Conserva el id del plugin que publicaba nova-java-16-spring-boot-gradle-plugin (ADR-044).
-            id = "pe.edu.nova.java.spring-boot"
+            // No reusa el id del repo 16: su marcador pertenece a ese repositorio (ADR-044).
+            id = "pe.edu.nova.java.spring-boot-service"
             implementationClass = "pe.edu.nova.java.gradle.springboot.NovaSpringBootPlugin"
             displayName = "Nova Spring Boot"
             description = project.description
