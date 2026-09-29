@@ -14,12 +14,12 @@ import pe.edu.nova.java.gradle.quality.NovaSecurity;
 import pe.edu.nova.java.gradle.quality.NovaVersions;
 
 /**
- * {@code pe.edu.nova.java.spring-boot}: un servicio Spring Boot de Nova (ADR-044).
+ * {@code pe.edu.nova.java.spring-boot-service}: un servicio Spring Boot de Nova (ADR-044).
  *
  * <p>Aplica {@code pe.edu.nova.java.quality} y encima Spring Boot con su BOM, los starters de máscara y
  * estándar de API de Nova, las pruebas de Spring con las reglas de arquitectura, OWASP con el SBOM y
- * la imagen del contenedor. Conserva el id del plugin del repositorio 16, así que un consumidor solo
- * sube la versión.
+ * la imagen del contenedor. Reemplaza al plugin {@code pe.edu.nova.java.spring-boot} del repositorio
+ * 16, que no se puede publicar desde aquí.
  */
 public class NovaSpringBootPlugin implements Plugin<Project> {
 

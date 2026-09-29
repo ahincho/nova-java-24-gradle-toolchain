@@ -13,11 +13,13 @@ Checkstyle o arreglar el bloque de OWASP se hace aquí y llega con una versión 
 | Plugin | Para quién | Qué aplica |
 |---|---|---|
 | `pe.edu.nova.java.quality` | todo proyecto Java | Java 25, formato, Checkstyle, pruebas, cobertura, validación de commits y su hook |
-| `pe.edu.nova.java.spring-boot` | servicios Spring Boot | `quality`, más Spring Boot con su BOM, los starters de Nova, OWASP, el SBOM y la imagen |
+| `pe.edu.nova.java.spring-boot-service` | servicios Spring Boot | `quality`, más Spring Boot con su BOM, los starters de Nova, OWASP, el SBOM y la imagen |
 
-`pe.edu.nova.java.spring-boot` conserva el id del plugin de `nova-java-16-spring-boot-gradle-plugin`,
-así que un consumidor solo sube la versión. Los plugins de librería y de Quarkus llegan con la
-migración de ADR-044.
+El plugin de servicios no reusa el id de `nova-java-16-spring-boot-gradle-plugin`: el registro de Maven
+de GitHub Packages no deja que otro repositorio publique su marcador. Un consumidor del repo 16 migra
+cambiando una línea, `id("pe.edu.nova.java.spring-boot") version "1.0.3"` por
+`id("pe.edu.nova.java.spring-boot-service") version "1.0.0"`. Los plugins de librería y de Quarkus
+llegan con la migración de ADR-044.
 
 ```kotlin
 // settings.gradle.kts
@@ -36,7 +38,7 @@ pluginManagement {
 
 // build.gradle.kts
 plugins {
-    id("pe.edu.nova.java.spring-boot") version "2.0.0"
+    id("pe.edu.nova.java.spring-boot-service") version "1.0.0"
 }
 ```
 

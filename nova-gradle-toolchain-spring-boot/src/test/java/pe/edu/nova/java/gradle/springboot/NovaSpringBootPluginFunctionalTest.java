@@ -22,7 +22,7 @@ class NovaSpringBootPluginFunctionalTest {
 
     private static final String PLUGINS = """
             plugins {
-                id("pe.edu.nova.java.spring-boot")
+                id("pe.edu.nova.java.spring-boot-service")
             }
             """;
 
