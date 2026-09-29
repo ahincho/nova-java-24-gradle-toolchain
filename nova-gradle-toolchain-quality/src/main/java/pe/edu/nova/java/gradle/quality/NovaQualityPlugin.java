@@ -87,6 +87,11 @@ public class NovaQualityPlugin implements Plugin<Project> {
             archive.setReproducibleFileOrder(true);
         });
         contract(project, nova);
+        // La raíz de un build de varios módulos junta el SBOM de todos en build/reports/cyclonedx, donde lo
+        // busca el CI compartido. Sin esto, cada módulo deja el suyo y el CI sube solo el primero que encuentra.
+        if (project == project.getRootProject() && !project.getChildProjects().isEmpty()) {
+            project.getPluginManager().apply("org.cyclonedx.bom");
+        }
     }
 
     private static void repositories(Project project) {
