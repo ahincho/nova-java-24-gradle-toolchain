@@ -1,5 +1,7 @@
 package pe.edu.nova.java.gradle.quality.commit;
 
+import java.io.FileDescriptor;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
@@ -31,7 +33,10 @@ public final class CommitMessageHook {
      * @param args la ruta del archivo con el mensaje
      */
     public static void main(String[] args) {
-        System.exit(run(args, System.err));
+        // En UTF-8 siempre: con la codificación de la consola de Windows, las tildes salían rotas en la
+        // terminal de Git, que lee UTF-8.
+        PrintStream err = new PrintStream(new FileOutputStream(FileDescriptor.err), true, StandardCharsets.UTF_8);
+        System.exit(run(args, err));
     }
 
     /**
