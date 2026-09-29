@@ -9,4 +9,5 @@ dependencyResolutionManagement {
 }
 
 include("nova-gradle-toolchain-quality")
+include("nova-gradle-toolchain-library")
 include("nova-gradle-toolchain-spring-boot")

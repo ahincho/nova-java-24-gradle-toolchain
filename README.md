@@ -13,13 +13,14 @@ Checkstyle o arreglar el bloque de OWASP se hace aquí y llega con una versión 
 | Plugin | Para quién | Qué aplica |
 |---|---|---|
 | `pe.edu.nova.java.quality` | todo proyecto Java | Java 25, formato, Checkstyle, pruebas, cobertura, validación de commits y su hook |
+| `pe.edu.nova.java.library` | librerías y starters de la plataforma | `quality`, más `java-library`, los jars de fuentes y javadoc, la publicación con su POM, la firma, OWASP y el SBOM |
 | `pe.edu.nova.java.spring-boot-service` | servicios Spring Boot | `quality`, más Spring Boot con su BOM, los starters de Nova, OWASP, el SBOM y la imagen |
 
 El plugin de servicios no reusa el id de `nova-java-16-spring-boot-gradle-plugin`: el registro de Maven
 de GitHub Packages no deja que otro repositorio publique su marcador. Un consumidor del repo 16 migra
 cambiando una línea, `id("pe.edu.nova.java.spring-boot") version "1.0.3"` por
-`id("pe.edu.nova.java.spring-boot-service") version "1.0.0"`. Los plugins de librería y de Quarkus
-llegan con la migración de ADR-044.
+`id("pe.edu.nova.java.spring-boot-service") version "1.0.0"`. El plugin de Quarkus llega con el
+catálogo de Plaza.
 
 ```kotlin
 // settings.gradle.kts
@@ -44,6 +45,33 @@ plugins {
 
 El plugin agrega por su cuenta el registro de los paquetes de Nova, restringido a los grupos
 `pe.edu.nova.*`, así que el `build.gradle.kts` de un servicio no declara repositorios.
+
+## Una librería
+
+Una librería publica en el GitHub Packages de su propio repositorio, que sale de `GITHUB_REPOSITORY`,
+la variable que el CI siempre define. En un build local no existe, así que la librería se publica en
+`mavenLocal` y no en GitHub Packages; para otro destino está la propiedad `nova.repository` en
+`gradle.properties`. El POM lleva la licencia EPL-2.0, el autor y el repositorio, y la publicación se
+firma cuando el CI trae la llave GPG.
+
+En un repositorio de varios módulos, como una capacidad con su contrato y sus adaptadores, la raíz
+aplica `quality` y cada módulo aplica `library`:
+
+```kotlin
+// build.gradle.kts de la raíz
+plugins {
+    id("pe.edu.nova.java.quality") version "1.1.0"
+    id("pe.edu.nova.java.library") version "1.1.0" apply false
+}
+
+// build.gradle.kts de cada módulo
+plugins {
+    id("pe.edu.nova.java.library")
+}
+```
+
+La raíz formatea sus propios scripts, instala el hook y junta el SBOM de todos los módulos en
+`build/reports/cyclonedx`, donde lo busca el CI compartido.
 
 ## Las tareas
 
