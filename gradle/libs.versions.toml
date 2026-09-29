@@ -16,6 +16,10 @@ assertj = "3.27.7"
 testcontainers = "2.0.5"
 archunit = "1.5.1"
 nova-architecture-rules = "1.1.2"
+# Correcciones de seguridad del classpath del plugin: Spotless y OWASP arrastran versiones con CVE.
+httpclient5 = "5.6.4"
+httpcore5 = "5.4.4"
+kotlin = "2.4.20"
 # Frameworks y starters de Nova
 spring-boot = "4.0.8"
 nova-mask-spring-boot-starter = "2.0.0"
@@ -28,3 +32,8 @@ cyclonedx-plugin = { module = "org.cyclonedx:cyclonedx-gradle-plugin", version.r
 spring-boot-plugin = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "spring-boot" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
+httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "httpclient5" }
+httpclient5-cache = { module = "org.apache.httpcomponents.client5:httpclient5-cache", version.ref = "httpclient5" }
+httpcore5 = { module = "org.apache.httpcomponents.core5:httpcore5", version.ref = "httpcore5" }
+httpcore5-h2 = { module = "org.apache.httpcomponents.core5:httpcore5-h2", version.ref = "httpcore5" }
+kotlin-bom = { module = "org.jetbrains.kotlin:kotlin-bom", version.ref = "kotlin" }
