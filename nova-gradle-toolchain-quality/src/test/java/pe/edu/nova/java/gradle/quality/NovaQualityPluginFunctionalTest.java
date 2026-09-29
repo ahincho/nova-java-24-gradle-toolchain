@@ -230,4 +230,33 @@ class NovaQualityPluginFunctionalTest {
         assertThat(project.read(".git/hooks/commit-msg")).contains("lefthook");
         assertThat(result.getOutput()).contains("no es de Nova");
     }
+
+    @Test
+    void theRootOfAMultiModuleBuildAggregatesTheSbom() {
+        TestProject project = TestProject.quality(directory)
+                .write("settings.gradle.kts", "rootProject.name = \"sample\"\ninclude(\"module\")\n")
+                .write("module/build.gradle.kts", "")
+                .write("build.gradle.kts", """
+                        plugins {
+                            id("pe.edu.nova.java.quality")
+                        }
+
+                        println("SBOM=${pluginManager.hasPlugin("org.cyclonedx.bom")}")
+                        """);
+
+        assertThat(project.build("help").getOutput()).contains("SBOM=true");
+    }
+
+    @Test
+    void aSingleProjectLeavesTheSbomToItsPlugin() {
+        TestProject project = TestProject.quality(directory).write("build.gradle.kts", """
+                plugins {
+                    id("pe.edu.nova.java.quality")
+                }
+
+                println("SBOM=${pluginManager.hasPlugin("org.cyclonedx.bom")}")
+                """);
+
+        assertThat(project.build("help").getOutput()).contains("SBOM=false");
+    }
 }

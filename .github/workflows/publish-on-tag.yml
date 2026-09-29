@@ -136,6 +136,6 @@ jobs:
         uses: ahincho/nova-shared-02-pipelines/.github/actions/nova-verify-publication@main
         with:
           group-id: pe.edu.nova.java
-          artifact-ids: nova-gradle-toolchain-quality nova-gradle-toolchain-spring-boot
+          artifact-ids: nova-gradle-toolchain-quality nova-gradle-toolchain-library nova-gradle-toolchain-spring-boot
           version: ${{ steps.detect.outputs.tag }}
           token: ${{ github.token }}
