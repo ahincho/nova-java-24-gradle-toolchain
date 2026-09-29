@@ -1,0 +1,67 @@
+<?xml version="1.0"?>
+<!DOCTYPE module PUBLIC
+        "-//Checkstyle//DTD Checkstyle Configuration 1.3//EN"
+        "https://checkstyle.org/dtds/configuration_1_3.dtd">
+
+<!--
+  Nova Platform: la configuración de Checkstyle del toolchain de Java (ADR-044).
+
+  Solo defectos, y todos en error. El estilo -sangría, espacios, llaves, largo de línea- lo resuelve
+  el formateador, que además lo corrige solo. Una regla que un formateador puede arreglar no va aquí.
+
+  Un repositorio puede sumar reglas o suprimir una con @SuppressWarnings("checkstyle:<Regla>"),
+  a la vista de quien revisa.
+-->
+<module name="Checker">
+    <property name="charset" value="UTF-8"/>
+    <property name="severity" value="error"/>
+    <property name="fileExtensions" value="java"/>
+
+    <module name="SuppressWarningsFilter"/>
+
+    <module name="TreeWalker">
+        <module name="SuppressWarningsHolder"/>
+
+        <!-- Imports: uno que sobra o que esconde de dónde sale una clase -->
+        <module name="UnusedImports"/>
+        <module name="RedundantImport"/>
+        <module name="AvoidStarImport">
+            <property name="allowStaticMemberImports" value="true"/>
+        </module>
+        <module name="IllegalImport"/>
+
+        <!-- Contratos que se rompen sin que el compilador diga nada -->
+        <module name="EqualsHashCode"/>
+        <module name="CovariantEquals"/>
+        <module name="StringLiteralEquality"/>
+        <module name="SuperClone"/>
+
+        <!-- Errores que un formateador no ve -->
+        <module name="EmptyCatchBlock">
+            <property name="exceptionVariableName" value="expected|ignored"/>
+        </module>
+        <module name="EmptyStatement"/>
+        <module name="FallThrough"/>
+        <module name="DefaultComesLast"/>
+        <module name="InnerAssignment"/>
+        <module name="ModifiedControlVariable"/>
+        <module name="NeedBraces"/>
+        <module name="OneStatementPerLine"/>
+        <module name="MultipleVariableDeclarations"/>
+        <module name="SimplifyBooleanExpression"/>
+        <module name="SimplifyBooleanReturn"/>
+        <module name="MissingOverride"/>
+        <module name="ModifierOrder"/>
+
+        <!-- Las convenciones de nombres de Java: el formateador no renombra -->
+        <module name="PackageName">
+            <property name="format" value="^[a-z]+(\.[a-z][a-z0-9]*)*$"/>
+        </module>
+        <module name="TypeName"/>
+        <module name="MethodName"/>
+        <module name="MemberName"/>
+        <module name="ParameterName"/>
+        <module name="LocalVariableName"/>
+        <module name="ConstantName"/>
+    </module>
+</module>
