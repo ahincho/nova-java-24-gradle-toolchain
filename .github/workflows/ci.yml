@@ -75,6 +75,11 @@ jobs:
     uses: ahincho/nova-shared-02-pipelines/.github/workflows/reusable-owasp-check.yml@main
     with:
       build-tool: gradle
+      # NVD confunde dependency-management-plugin con Spring Framework y spring-boot-loader-tools con
+      # Spring Tools; llegan con el plugin de Spring Boot. Cada CVE está documentado en
+      # docs/owasp-suppressions.json de nova-shared-02-pipelines, acotado a su paquete, igual que en el repo 16.
+      cve-suppressions: >-
+        CVE-2018-1270,CVE-2022-22965,CVE-2026-47884,CVE-2026-47891,CVE-2026-59283,CVE-2024-22259,CVE-2016-9878,CVE-2018-11040,CVE-2026-47886,CVE-2026-47893,CVE-2026-59282,CVE-2022-31691
     secrets: inherit
 
   sbom:
