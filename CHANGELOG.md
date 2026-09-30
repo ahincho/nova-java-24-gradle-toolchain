@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.3.1](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v1.3.0...v1.3.1) (2026-09-30)
+
+
+### Bug Fixes
+
+* pin the Tomcat and Jackson patches of every service ([54f0de7](https://github.com/ahincho/nova-java-24-gradle-toolchain/commit/54f0de7e71fb3fdab64ea030118a9b41ce054907))
+
 ## [1.3.0](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v1.2.0...v1.3.0) (2026-09-30)
 
 
