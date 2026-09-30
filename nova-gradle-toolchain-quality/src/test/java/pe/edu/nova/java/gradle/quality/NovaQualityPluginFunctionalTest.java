@@ -259,4 +259,23 @@ class NovaQualityPluginFunctionalTest {
 
         assertThat(project.build("help").getOutput()).contains("SBOM=false");
     }
+
+    @Test
+    void checkstyleLeavesAGeneratedSourceSetOut() {
+        TestProject project = TestProject.quality(directory).write("build.gradle.kts", """
+                plugins {
+                    id("pe.edu.nova.java.quality")
+                }
+
+                // Como el source set que crea el procesamiento AOT de Spring.
+                sourceSets.create("aot")
+                """);
+
+        String output = project.build("check", "--dry-run").getOutput();
+
+        assertThat(output)
+                .contains(":checkstyleMain")
+                .contains(":checkstyleTest")
+                .doesNotContain(":checkstyleAot");
+    }
 }
