@@ -226,8 +226,11 @@ con el mismo usuario, el mismo puerto y el mismo arranque como PID 1 que la imag
 compilador tiene un tope de 6 GB de heap. Un servicio mínimo compila en unos dos minutos, con un pico de
 4 GB, en una máquina de 12 núcleos.
 
-En Docker Hardened Images, la base equivalente es la variante `glibc-debian13` de `dhi.io/static`; la
-de Alpine no sirve, porque trae musl y el ejecutable se enlaza con glibc.
+**El SBOM del jar viaja dentro de la imagen nativa,** en `/application/sbom`. Las librerías quedan
+compiladas en el ejecutable y un escáner no las ve en un binario, así que sin el SBOM la imagen nativa
+aparentaría no tener dependencias vulnerables. Con él, Trivy reporta las mismas que en la imagen de la
+JVM. En Docker Hardened Images, la base equivalente es la variante `glibc-debian13` de `dhi.io/static`;
+la de Alpine no sirve, porque trae musl y el ejecutable se enlaza con glibc.
 
 Con GraalVM instalado, `./gradlew nativeCompile` compila el ejecutable de la propia máquina para ensayar.
 Busca GraalVM en `GRAALVM_HOME`. En Windows pide también las herramientas de C++ de Visual Studio, y si

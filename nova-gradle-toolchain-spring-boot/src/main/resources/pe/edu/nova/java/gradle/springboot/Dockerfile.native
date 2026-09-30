@@ -43,7 +43,7 @@ RUN mkdir -p extracted metadata/META-INF \
     && mv META-INF/native-image ../metadata/META-INF/native-image \
     && classpath="../metadata:BOOT-INF/classes" \
     && for library in BOOT-INF/lib/*.jar; do classpath="${classpath}:${library}"; done \
-    && native-image "-J-Xmx${NATIVE_IMAGE_HEAP}" --static-nolibc -cp "${classpath}" -o /workspace/application
+    && native-image "-J-Xmx${NATIVE_IMAGE_HEAP}" --static-nolibc -cp "${classpath}" -o /workspace/application     && mkdir -p /workspace/sbom     && if [ -d META-INF/sbom ]; then cp META-INF/sbom/* /workspace/sbom/; fi
 
 # ---------------------------------------------------------------------------
 # runtime: el ejecutable solo, sin JVM
@@ -51,6 +51,10 @@ RUN mkdir -p extracted metadata/META-INF \
 FROM ${RUNTIME_IMAGE} AS runtime
 WORKDIR /application
 COPY --from=native /workspace/application ./application
+
+# El SBOM del jar viaja con el ejecutable. Las librerías quedan compiladas adentro, y un escáner no las
+# ve en un binario: sin el SBOM, la imagen nativa aparentaría no tener dependencias vulnerables.
+COPY --from=native /workspace/sbom/ ./sbom/
 
 # Un usuario sin privilegios, el mismo que la imagen de la JVM.
 USER 10001:10001
