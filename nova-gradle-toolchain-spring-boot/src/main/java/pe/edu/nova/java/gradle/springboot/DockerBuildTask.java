@@ -66,6 +66,14 @@ public abstract class DockerBuildTask extends DefaultTask {
     public abstract ListProperty<String> getBuildArgs();
 
     /**
+     * La plantilla del Dockerfile: la de la JVM o la nativa.
+     *
+     * @return la propiedad
+     */
+    @Input
+    public abstract Property<String> getTemplate();
+
+    /**
      * Dónde se escribe el Dockerfile de la plataforma antes de construir.
      *
      * @return la propiedad
@@ -88,7 +96,8 @@ public abstract class DockerBuildTask extends DefaultTask {
         File jar = getJar().get().getAsFile();
         try {
             Files.createDirectories(dockerfile.toPath().getParent());
-            Files.writeString(dockerfile.toPath(), NovaDockerfile.content(), StandardCharsets.UTF_8);
+            Files.writeString(
+                    dockerfile.toPath(), NovaDockerfile.content(getTemplate().get()), StandardCharsets.UTF_8);
         } catch (IOException e) {
             throw new UncheckedIOException("nova: no se pudo escribir " + dockerfile, e);
         }

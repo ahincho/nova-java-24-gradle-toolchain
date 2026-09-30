@@ -21,6 +21,7 @@ import org.gradle.api.plugins.quality.CheckstyleExtension;
 import org.gradle.api.plugins.quality.CheckstylePlugin;
 import org.gradle.api.provider.Provider;
 import org.gradle.api.tasks.SourceSet;
+import org.gradle.api.tasks.SourceSetContainer;
 import org.gradle.api.tasks.TaskProvider;
 import org.gradle.api.tasks.bundling.AbstractArchiveTask;
 import org.gradle.api.tasks.compile.JavaCompile;
@@ -56,6 +57,12 @@ public class NovaQualityPlugin implements Plugin<Project> {
 
     /** El registro de los paquetes de Nova. GitHub resuelve desde él cualquier paquete de la cuenta. */
     public static final String NOVA_PACKAGES = "https://maven.pkg.github.com/ahincho/nova-java-24-gradle-toolchain";
+
+    /**
+     * Las banderas de javac que convierten cualquier advertencia en error. Un plugin que compila código
+     * generado, que no es del proyecto, se las quita a esa tarea.
+     */
+    public static final List<String> STRICT_COMPILER_ARGS = List.of("-Xlint:all,-processing", "-Werror");
 
     private static final int JAVA_VERSION = 25;
     private static final String CHECKSTYLE_CONFIG = "checkstyle.xml";
@@ -118,7 +125,8 @@ public class NovaQualityPlugin implements Plugin<Project> {
             compile.getOptions().getRelease().convention(JAVA_VERSION);
             // -processing se apaga porque avisa de anotaciones que ningún procesador reclama, algo
             // normal con Spring o JPA, y con -Werror rompería el build sin que haya un defecto.
-            compile.getOptions().getCompilerArgs().addAll(List.of("-parameters", "-Xlint:all,-processing", "-Werror"));
+            compile.getOptions().getCompilerArgs().add("-parameters");
+            compile.getOptions().getCompilerArgs().addAll(STRICT_COMPILER_ARGS);
         });
     }
 
@@ -151,6 +159,13 @@ public class NovaQualityPlugin implements Plugin<Project> {
         checkstyle.setConfig(project.getResources().getText().fromString(resource(CHECKSTYLE_CONFIG)));
         checkstyle.setMaxWarnings(0);
         checkstyle.setIgnoreFailures(false);
+        // Solo el código del proyecto. Un source set generado, como el del procesamiento AOT de Spring, no
+        // lo escribió nadie del equipo, y check no tiene que revisarlo.
+        SourceSetContainer sourceSets =
+                project.getExtensions().getByType(JavaPluginExtension.class).getSourceSets();
+        checkstyle.setSourceSets(List.of(
+                sourceSets.getByName(SourceSet.MAIN_SOURCE_SET_NAME),
+                sourceSets.getByName(SourceSet.TEST_SOURCE_SET_NAME)));
     }
 
     private static void tests(Project project, NovaVersions versions) {

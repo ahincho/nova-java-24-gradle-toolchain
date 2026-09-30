@@ -22,6 +22,8 @@ httpcore5 = "5.4.4"
 kotlin = "2.4.20"
 # Frameworks y starters de Nova
 spring-boot = "4.0.8"
+# La que maneja Spring Boot 4.0.8 para la imagen nativa (ADR-045).
+native-build-tools = "0.11.5"
 nova-mask-spring-boot-starter = "2.0.0"
 nova-api-standard-spring-boot-starter = "2.0.0"
 
@@ -30,6 +32,7 @@ spotless-plugin = { module = "com.diffplug.spotless:spotless-plugin-gradle", ver
 dependency-check-plugin = { module = "org.owasp:dependency-check-gradle", version.ref = "dependency-check" }
 cyclonedx-plugin = { module = "org.cyclonedx:cyclonedx-gradle-plugin", version.ref = "cyclonedx" }
 spring-boot-plugin = { module = "org.springframework.boot:spring-boot-gradle-plugin", version.ref = "spring-boot" }
+native-build-tools-plugin = { module = "org.graalvm.buildtools:native-gradle-plugin", version.ref = "native-build-tools" }
 junit-bom = { module = "org.junit:junit-bom", version.ref = "junit" }
 assertj-core = { module = "org.assertj:assertj-core", version.ref = "assertj" }
 httpclient5 = { module = "org.apache.httpcomponents.client5:httpclient5", version.ref = "httpclient5" }

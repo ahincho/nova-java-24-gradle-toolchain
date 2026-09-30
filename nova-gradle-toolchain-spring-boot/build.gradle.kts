@@ -3,6 +3,8 @@ description = "Nova Spring Boot plugin: the quality plugin plus Spring Boot, the
 dependencies {
     implementation(project(":nova-gradle-toolchain-quality"))
     implementation(libs.spring.boot.plugin)
+    // Se aplica solo cuando el servicio pide el modo nativo (ADR-045).
+    implementation(libs.native.build.tools.plugin)
 }
 
 gradlePlugin {

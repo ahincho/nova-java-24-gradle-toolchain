@@ -5,22 +5,32 @@ import java.io.InputStream;
 import java.io.UncheckedIOException;
 import java.nio.charset.StandardCharsets;
 
-/** El Dockerfile de la plataforma, empaquetado en el plugin. No se copia a cada repositorio. */
+/** Los Dockerfiles de la plataforma, empaquetados en el plugin. No se copian a cada repositorio. */
 final class NovaDockerfile {
 
     /** La marca que identifica un Dockerfile de Nova. */
     static final String MARKER = "Nova Platform: la imagen de un servicio Spring Boot";
 
+    /** La plantilla de la imagen de la JVM. */
+    static final String JVM = "Dockerfile";
+
+    /** La plantilla de la imagen nativa (ADR-045). */
+    static final String NATIVE = "Dockerfile.native";
+
     private NovaDockerfile() {}
 
     static String content() {
-        try (InputStream in = NovaDockerfile.class.getResourceAsStream("Dockerfile")) {
+        return content(JVM);
+    }
+
+    static String content(String template) {
+        try (InputStream in = NovaDockerfile.class.getResourceAsStream(template)) {
             if (in == null) {
-                throw new IllegalStateException("The Nova toolchain jar does not contain its Dockerfile");
+                throw new IllegalStateException("The Nova toolchain jar does not contain " + template);
             }
             return new String(in.readAllBytes(), StandardCharsets.UTF_8);
         } catch (IOException e) {
-            throw new UncheckedIOException("Could not read the Nova Dockerfile", e);
+            throw new UncheckedIOException("Could not read " + template + " from the Nova toolchain jar", e);
         }
     }
 
