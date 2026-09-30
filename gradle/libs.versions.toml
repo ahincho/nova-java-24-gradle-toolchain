@@ -24,6 +24,11 @@ kotlin = "2.4.20"
 spring-boot = "4.0.8"
 # La que maneja Spring Boot 4.0.8 para la imagen nativa (ADR-045).
 native-build-tools = "0.11.5"
+# Correcciones de seguridad del classpath de cada servicio. Spring Boot 4.0.8 maneja Tomcat 11.0.24 y
+# Jackson 3.1.5, con CVE que ya tienen arreglo; ninguna versión de Spring Boot trae todavía estos parches.
+# Cuando Spring Boot los traiga, se borran junto con sus restricciones en el plugin de servicios.
+tomcat = "11.0.26"
+jackson = "3.1.7"
 nova-mask-spring-boot-starter = "2.0.0"
 nova-api-standard-spring-boot-starter = "2.0.0"
 

@@ -54,6 +54,25 @@ class NovaSpringBootPluginFunctionalTest {
     }
 
     @Test
+    void itPinsTheSecurityPatchesThatSpringBootDoesNotBringYet() {
+        write("build.gradle.kts", PLUGINS + """
+
+                // Se imprime al configurar: una tarea que lo hiciera no sería compatible con el configuration cache.
+                val implementation = configurations.getByName("implementation")
+                println("CONSTRAINTS=${implementation.dependencyConstraints.map { "${it.group}:${it.name}:${it.version}" }}")
+                println("PLATFORMS=${implementation.dependencies.map { "${it.group}:${it.name}:${it.version}" }}")
+                """);
+
+        BuildResult result = run("help");
+
+        assertThat(result.getOutput())
+                .contains("org.apache.tomcat.embed:tomcat-embed-core:11.0.26")
+                .contains("org.apache.tomcat.embed:tomcat-embed-el:11.0.26")
+                .contains("org.apache.tomcat.embed:tomcat-embed-websocket:11.0.26")
+                .contains("tools.jackson:jackson-bom:3.1.7");
+    }
+
+    @Test
     void novaDockerEjectWritesTheDockerfileWithItsOrigin() {
         write("build.gradle.kts", PLUGINS);
 
