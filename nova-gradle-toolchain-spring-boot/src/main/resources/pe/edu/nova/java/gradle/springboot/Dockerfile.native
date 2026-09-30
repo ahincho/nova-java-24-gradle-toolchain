@@ -1,0 +1,58 @@
+# syntax=docker/dockerfile:1.7
+# Nova Platform: la imagen de un servicio Spring Boot, en modo nativo (ADR-045). La construye
+# novaDockerNative cuando el servicio tiene nova.native=true.
+#
+#   ./gradlew novaDockerNative
+#   ./gradlew novaDockerNative --build-arg=NATIVE_IMAGE_HEAP=8g
+#
+# El ejecutable se compila aquí adentro, en Linux, a partir del jar que ya construyó Gradle con el
+# procesamiento AOT de Spring. El mismo comando funciona en Windows y en el CI sin GraalVM instalado:
+# un ejecutable compilado en Windows no corre en un contenedor Linux.
+#
+# Como la imagen de la JVM, es una sola para todos los ambientes: el ambiente llega como variable de
+# entorno al arrancar.
+
+# Las imágenes base como ARG, para fijarlas por digest sin perder la variable.
+ARG GRAALVM_IMAGE=ghcr.io/graalvm/native-image-community:25
+ARG RUNTIME_IMAGE=gcr.io/distroless/base-debian12
+
+# ---------------------------------------------------------------------------
+# native: compila el ejecutable
+# ---------------------------------------------------------------------------
+FROM ${GRAALVM_IMAGE} AS native
+WORKDIR /workspace
+ARG JAR_FILE
+# El heap del compilador. Sin tope, native-image toma buena parte de la memoria de la máquina.
+ARG NATIVE_IMAGE_HEAP=6g
+COPY ${JAR_FILE} application.jar
+# En la raíz del jar están los metadatos de las librerías y el native-image.properties que el
+# procesamiento AOT escribe con la clase principal. Van al classpath en un directorio aparte: la raíz
+# entera traería el lanzador de Spring Boot, que en nativo no hace falta y no compila. Por lo mismo, el
+# classpath no termina en ':', porque una entrada vacía es el directorio actual.
+#
+# --static-nolibc enlaza todo de forma estática menos glibc, así que la base de ejecución solo necesita
+# glibc. Sin él, el ejecutable pide libz.so.1, que la base mínima no trae.
+RUN mkdir -p extracted metadata/META-INF \
+    && cd extracted \
+    && jar -xf ../application.jar \
+    && mv META-INF/native-image ../metadata/META-INF/native-image \
+    && classpath="../metadata:BOOT-INF/classes" \
+    && for library in BOOT-INF/lib/*.jar; do classpath="${classpath}:${library}"; done \
+    && native-image "-J-Xmx${NATIVE_IMAGE_HEAP}" --static-nolibc -cp "${classpath}" -o /workspace/application
+
+# ---------------------------------------------------------------------------
+# runtime: el ejecutable solo, sin JVM
+# ---------------------------------------------------------------------------
+FROM ${RUNTIME_IMAGE} AS runtime
+WORKDIR /application
+COPY --from=native /workspace/application ./application
+
+# Un usuario sin privilegios, el mismo que la imagen de la JVM.
+USER 10001:10001
+
+# El puerto por convención de la plataforma para los servicios Java.
+EXPOSE 8080
+
+# El ejecutable directo y en forma exec: el proceso queda como PID 1 y recibe el SIGTERM del
+# orquestador, así el apagado ordenado de Spring Boot ocurre.
+ENTRYPOINT ["/application/application"]

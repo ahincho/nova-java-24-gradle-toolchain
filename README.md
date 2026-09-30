@@ -84,6 +84,7 @@ La raíz formatea sus propios scripts, instala el hook y junta el SBOM de todos 
 | `novaSecurity` | OWASP y el SBOM; va aparte porque tarda |
 | `novaDocker` | construye la imagen con el Dockerfile de la plataforma |
 | `novaDockerEject` | escribe ese Dockerfile en el repositorio, para un pipeline que lo exige |
+| `novaDockerNative` | construye la imagen nativa, si el servicio activó el modo nativo |
 
 `check` depende de `novaVerify`, así que `./gradlew build` verifica lo mismo que el CI.
 
@@ -184,6 +185,40 @@ El build corre fuera de Docker y la imagen solo copia el jar, así que no necesi
 registro. `novaDockerEject` escribe el Dockerfile con un encabezado que dice de dónde salió, y nunca
 reemplaza uno que no es de Nova.
 
+## El modo nativo
+
+Un servicio también puede salir como ejecutable nativo de GraalVM
+([ADR-045](https://github.com/ahincho/nova-shared-01-docs/blob/main/adrs/java/ADR-045-imagen-nativa-junto-a-la-jvm.md)).
+Es opcional, y se activa por servicio en `gradle.properties`:
+
+```properties
+nova.native=true
+```
+
+Con eso, el plugin aplica GraalVM Native Build Tools, que activa el procesamiento AOT de Spring, y
+registra `novaDockerNative`. Sin la propiedad no cambia nada, y la imagen de la JVM sigue siendo la de
+siempre.
+
+```bash
+./gradlew novaDockerNative
+./gradlew novaDockerNative --build-arg=NATIVE_IMAGE_HEAP=8g
+```
+
+El ejecutable se compila dentro de Docker, en Linux, a partir del jar, así que funciona igual en
+Windows y en el CI sin GraalVM instalado. La imagen es `<servicio>:<versión>-native`: el ejecutable sobre
+distroless con glibc, con el mismo usuario, el mismo puerto y el mismo arranque como PID 1 que la imagen
+de la JVM. El compilador tiene un tope de 6 GB de heap. Un servicio mínimo compila en unos dos minutos,
+con un pico de 4 GB, en una máquina de 12 núcleos.
+
+Con GraalVM instalado, `./gradlew nativeCompile` compila el ejecutable de la propia máquina para ensayar.
+Busca GraalVM en `GRAALVM_HOME`. En Windows pide también las herramientas de C++ de Visual Studio, y si
+`native-image` no reconoce la versión instalada, se corre después de `vcvarsall.bat x64` o desde la
+consola «x64 Native Tools Command Prompt». Ese `.exe` no corre en un contenedor Linux: la imagen se
+construye siempre con `novaDockerNative`.
+
+Con el modo nativo, el procesamiento AOT arranca la aplicación al compilar para preparar sus beans, y el
+código que genera no pasa por `-Werror` ni por Checkstyle, porque no lo escribió nadie del equipo.
+
 ## Desarrollo
 
 ```bash
@@ -192,7 +227,8 @@ reemplaza uno que no es de Nova.
 
 Las pruebas corren cada plugin sobre proyectos reales con TestKit y el configuration cache encendido.
 La de un servicio Spring Boot resuelve los starters de Nova, así que pide `GITHUB_ACTOR` y un
-`GITHUB_TOKEN` con `read:packages`, y si hay Docker también construye la imagen.
+`GITHUB_TOKEN` con `read:packages`, y si hay Docker también construye la imagen. La de la imagen nativa
+tarda minutos, así que corre solo con `NOVA_NATIVE_TEST=true`, y el CI la corre en el PR de cada versión.
 
 El toolchain no puede aplicarse a sí mismo, así que su `build.gradle.kts` repite lo que sus plugins
 aplican, y su CI valida los commits con el mismo hook sobre el jar recién construido.

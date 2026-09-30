@@ -55,6 +55,28 @@ jobs:
           done
           exit $failed
 
+  # La imagen nativa tarda minutos y pide varios GB de RAM, así que se prueba al publicar una versión
+  # (ADR-045): en el PR de release-please, no en cada PR.
+  native:
+    if: github.event_name == 'pull_request' && startsWith(github.head_ref, 'release-please--')
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    permissions:
+      contents: read
+      packages: read
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1  # v7.0.1
+      - uses: actions/setup-java@03ad4de0992f5dab5e18fcb136590ce7c4a0ac95  # v5
+        with:
+          distribution: temurin
+          java-version: '25'
+      - name: Construir, arrancar y consultar una imagen nativa
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          NOVA_NATIVE_TEST: 'true'
+        run: ./gradlew :nova-gradle-toolchain-spring-boot:test --tests '*NovaNativeImageFunctionalTest'
+
   sonar:
     if: github.event_name == 'pull_request'
     uses: ahincho/nova-shared-02-pipelines/.github/workflows/reusable-sonarcloud-gradle.yml@main
