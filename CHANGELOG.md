@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v1.2.0...v1.3.0) (2026-09-30)
+
+
+### Features
+
+* carry the jar SBOM inside the native image ([7cb5a25](https://github.com/ahincho/nova-java-24-gradle-toolchain/commit/7cb5a251849764a8f690d85229113cfc59cae83f))
+* run both service images on distroless ([9b6c944](https://github.com/ahincho/nova-java-24-gradle-toolchain/commit/9b6c944bd9cbf46b0cbee54895e102c9429c6ce3))
+
 ## [1.2.0](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v1.1.1...v1.2.0) (2026-09-30)
 
 
