@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.0](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v1.1.1...v1.2.0) (2026-09-30)
+
+
+### Features
+
+* build a native image of a Spring Boot service ([d898689](https://github.com/ahincho/nova-java-24-gradle-toolchain/commit/d898689ecf5b9a4fa9bd822ddd4758e932ccb896))
+* keep Checkstyle on the code the project writes ([f77c7c6](https://github.com/ahincho/nova-java-24-gradle-toolchain/commit/f77c7c6415ab9115dc62d06a86ccd55ac4f08a40))
+
 ## [1.1.1](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v1.1.0...v1.1.1) (2026-09-29)
 
 
