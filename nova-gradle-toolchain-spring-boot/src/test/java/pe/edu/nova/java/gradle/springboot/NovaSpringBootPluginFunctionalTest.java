@@ -141,6 +141,10 @@ class NovaSpringBootPluginFunctionalTest {
             assertThat(dockerOutput("image", "inspect", "--format", "{{.Config.User}} {{.Config.ExposedPorts}}", image))
                     .contains("10001:10001")
                     .contains("8080/tcp");
+            // La imagen final es distroless (ADR-046): arranca la aplicación y no trae shell.
+            assertThat(dockerOutput("run", "--rm", image)).contains("Started SampleApplication");
+            assertThat(docker("run", "--rm", "--entrypoint", "sh", image, "-c", "true"))
+                    .isNotZero();
         } finally {
             docker("rmi", "--force", image);
         }

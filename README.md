@@ -171,9 +171,24 @@ repositorio.
 ```bash
 ./gradlew novaDocker
 ./gradlew novaDocker --tag=plaza-orders:dev
-./gradlew novaDocker --build-arg=JAVA_IMAGE=eclipse-temurin@sha256:...
+./gradlew novaDocker --build-arg=JAVA_IMAGE=gcr.io/distroless/java25-debian13@sha256:...
 ./gradlew novaDockerEject
 ```
+
+**La imagen final es distroless**
+([ADR-046](https://github.com/ahincho/nova-shared-01-docs/blob/main/adrs/java/ADR-046-imagenes-base-distroless.md)):
+`gcr.io/distroless/java25-debian13`, el mismo JRE Temurin 25 sin shell ni gestor de paquetes. Se
+descarga sin cuenta. Solo la etapa que abre el jar usa `eclipse-temurin:25-jre`, porque corre un `RUN`, y
+esa etapa no llega a la imagen final. Frente a la de Ubuntu, la imagen pesa 250 MB en vez de 359 MB y
+arranca igual.
+
+Sin shell no hay `docker exec ... sh`: para depurar está `docker debug`, o la variante `:debug` de
+distroless en `JAVA_IMAGE`. Para volver a la imagen de Ubuntu:
+`--build-arg=JAVA_IMAGE=eclipse-temurin:25-jre`.
+
+**Docker Hardened Images es la otra opción,** con la variante JRE 25 de `dhi.io/eclipse-temurin` en
+`JAVA_IMAGE`. Es gratis, pero pide `docker login dhi.io` con una cuenta de Docker antes del build, y en
+el CI, un secreto con esas credenciales.
 
 Es una sola imagen para todos los ambientes: el ambiente llega como variable de entorno al arrancar,
 así que lo que se probó en dev es lo que llega a prod. Expone el puerto 8080, la convención de los
@@ -206,9 +221,13 @@ siempre.
 
 El ejecutable se compila dentro de Docker, en Linux, a partir del jar, así que funciona igual en
 Windows y en el CI sin GraalVM instalado. La imagen es `<servicio>:<versión>-native`: el ejecutable sobre
-distroless con glibc, con el mismo usuario, el mismo puerto y el mismo arranque como PID 1 que la imagen
-de la JVM. El compilador tiene un tope de 6 GB de heap. Un servicio mínimo compila en unos dos minutos,
-con un pico de 4 GB, en una máquina de 12 núcleos.
+`gcr.io/distroless/base-nossl-debian13`, que solo trae glibc, los certificados y las zonas horarias,
+con el mismo usuario, el mismo puerto y el mismo arranque como PID 1 que la imagen de la JVM. El
+compilador tiene un tope de 6 GB de heap. Un servicio mínimo compila en unos dos minutos, con un pico de
+4 GB, en una máquina de 12 núcleos.
+
+En Docker Hardened Images, la base equivalente es la variante `glibc-debian13` de `dhi.io/static`; la
+de Alpine no sirve, porque trae musl y el ejecutable se enlaza con glibc.
 
 Con GraalVM instalado, `./gradlew nativeCompile` compila el ejecutable de la propia máquina para ensayar.
 Busca GraalVM en `GRAALVM_HOME`. En Windows pide también las herramientas de C++ de Visual Studio, y si

@@ -131,6 +131,9 @@ class NovaNativeImageFunctionalTest {
             assertThat(dockerOutput("image", "inspect", "--format", "{{.Config.User}} {{.Config.ExposedPorts}}", image))
                     .contains("10001:10001")
                     .contains("8080/tcp");
+            // Distroless, sin shell (ADR-046).
+            assertThat(docker("run", "--rm", "--entrypoint", "sh", image, "-c", "true"))
+                    .isNotZero();
 
             container = dockerOutput("run", "--detach", "--publish", "127.0.0.1::8080", image)
                     .strip();

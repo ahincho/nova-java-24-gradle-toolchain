@@ -13,8 +13,13 @@
 # entorno al arrancar.
 
 # Las imágenes base como ARG, para fijarlas por digest sin perder la variable.
+#
+# La imagen final es distroless sin OpenSSL (ADR-046): el ejecutable solo necesita glibc, porque el TLS
+# de Java no usa el del sistema y los certificados raíz quedan dentro del ejecutable. Docker Hardened
+# Images es la otra opción, con la variante glibc-debian13 de dhi.io/static en RUNTIME_IMAGE; pide antes
+# docker login dhi.io. La variante de Alpine no sirve: trae musl, y el ejecutable se enlaza con glibc.
 ARG GRAALVM_IMAGE=ghcr.io/graalvm/native-image-community:25
-ARG RUNTIME_IMAGE=gcr.io/distroless/base-debian12
+ARG RUNTIME_IMAGE=gcr.io/distroless/base-nossl-debian13
 
 # ---------------------------------------------------------------------------
 # native: compila el ejecutable
