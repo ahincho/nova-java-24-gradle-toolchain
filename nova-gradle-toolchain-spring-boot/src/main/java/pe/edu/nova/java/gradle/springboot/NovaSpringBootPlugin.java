@@ -52,6 +52,7 @@ public class NovaSpringBootPlugin implements Plugin<Project> {
         String implementation = JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME;
         String testImplementation = JavaPlugin.TEST_IMPLEMENTATION_CONFIGURATION_NAME;
         dependencies.add(implementation, dependencies.platform(SpringBootPlugin.BOM_COORDINATES));
+        securityPatches(dependencies, versions);
         dependencies.add(
                 implementation,
                 "pe.edu.nova.java.starters:nova-mask-spring-boot-starter:"
@@ -128,5 +129,24 @@ public class NovaSpringBootPlugin implements Plugin<Project> {
             task.getTemplate().set(NovaDockerfile.NATIVE);
             task.getDockerfile().set(project.getLayout().getBuildDirectory().file("nova-docker-native/Dockerfile"));
         });
+    }
+
+    /**
+     * Los parches de seguridad que Spring Boot todavía no trae: Tomcat 11.0.24 y Jackson 3.1.5 tienen CVE
+     * con arreglo publicado. Gradle resuelve la versión más alta, así que la restricción gana sobre la del
+     * BOM, y un servicio que necesite otra la puede declarar igual.
+     */
+    private static void securityPatches(DependencyHandler dependencies, NovaVersions versions) {
+        String implementation = JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME;
+        dependencies.add(implementation, dependencies.platform("tools.jackson:jackson-bom:" + versions.of("jackson")));
+        for (String module : List.of("tomcat-embed-core", "tomcat-embed-el", "tomcat-embed-websocket")) {
+            dependencies
+                    .getConstraints()
+                    .add(
+                            implementation,
+                            "org.apache.tomcat.embed:" + module + ":" + versions.of("tomcat"),
+                            constraint ->
+                                    constraint.because("Tomcat 11.0.24, managed by Spring Boot 4.0.8, has known CVEs"));
+        }
     }
 }
