@@ -131,6 +131,16 @@ class NovaNativeImageFunctionalTest {
             assertThat(dockerOutput("image", "inspect", "--format", "{{.Config.User}} {{.Config.ExposedPorts}}", image))
                     .contains("10001:10001")
                     .contains("8080/tcp");
+            // Distroless sin shell, y con el SBOM del jar para que un escáner vea las librerías (ADR-046).
+            assertThat(docker("run", "--rm", "--entrypoint", "sh", image, "-c", "true"))
+                    .isNotZero();
+            String created = dockerOutput("create", image).strip();
+            try {
+                assertThat(dockerOutput("cp", created + ":/application/sbom/application.cdx.json", "-"))
+                        .contains("\"bomFormat\"");
+            } finally {
+                docker("rm", created);
+            }
 
             container = dockerOutput("run", "--detach", "--publish", "127.0.0.1::8080", image)
                     .strip();
