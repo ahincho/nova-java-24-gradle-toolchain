@@ -241,6 +241,27 @@ construye siempre con `novaDockerNative`.
 Con el modo nativo, el procesamiento AOT arranca la aplicación al compilar para preparar sus beans, y el
 código que genera no pasa por `-Werror` ni por Checkstyle, porque no lo escribió nadie del equipo.
 
+## Migrar a la 2.0.0
+
+La 2.0.0 trae `nova-api-standard-spring-boot-starter` 3.0.0, que responde los errores con el modelo
+por capas de
+[ADR-031](https://github.com/ahincho/nova-shared-01-docs/blob/main/adrs/shared/ADR-031-modulo-de-errores-por-capas-con-trazabilidad.md).
+Los plugins de calidad y de librerías no cambian; el de servicios cambia lo que un cliente recibe ante
+un error. Lo que hay que revisar en un servicio:
+
+| Antes (1.x) | Desde la 2.0.0 | Qué hacer |
+|---|---|---|
+| el código `ERROR` en un error lanzado | el código del catálogo según el status, o el código propio del error | comparar contra el código del catálogo en las pruebas y en los clientes |
+| `VALIDATION_ERROR` en la validación | `BAD_REQUEST`, con los mismos errores por campo | comparar contra `BAD_REQUEST` |
+| `IllegalArgumentException` respondida como 400 | un `PlatformError`, respondido como 500 | lanzar `ApplicationError.invalidInput(...)` ante una entrada inválida |
+| mensajes genéricos en inglés, como `Not Found` | los mensajes del catálogo en español | no comparar contra el texto del mensaje |
+| `ErrorCodes` y `GlobalExceptionHandler.envelope(...)` | eliminados | usar `NovaErrorCatalog.platformCode(status)` o el bean `ErrorPorts` |
+
+La receta completa, con los puertos que una organización puede reemplazar, está en
+[«Migrating to 3.0.0»](https://github.com/ahincho/nova-java-08-commons-spring-boot-starter#migrating-to-300)
+del starter. `nova-mask-spring-boot-starter` pasa a la 3.0.0 solo porque sale con la misma versión: no
+cambia nada para quien lo usa.
+
 ## Desarrollo
 
 ```bash
