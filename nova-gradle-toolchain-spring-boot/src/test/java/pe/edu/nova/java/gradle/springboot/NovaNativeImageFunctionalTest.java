@@ -150,15 +150,23 @@ class NovaNativeImageFunctionalTest {
                             .findFirst()
                             .orElseThrow();
 
-            // Si no arranca, el contenedor se borra en el finally: sus logs tienen que ir en el mensaje.
-            String started = container;
             assertThat(awaitHealthy(address))
-                    .as(() -> "el servicio nativo no respondió en 30 s; sus logs:" + System.lineSeparator()
-                            + logsOf(started))
+                    .as("el servicio nativo responde /actuator/health en 30 s")
                     .isTrue();
             HttpResponse<String> greeting = get(address + "/greetings?name=Angel");
-            assertThat(greeting.statusCode()).isEqualTo(200);
+            assertThat(greeting.statusCode())
+                    .as("status de /greetings, con el cuerpo %s", greeting.body())
+                    .isEqualTo(200);
             assertThat(greeting.body()).contains("Hola, Angel");
+        } catch (AssertionError e) {
+            // El contenedor se borra en el finally: si el servicio falla, sus logs tienen que ir en el mensaje.
+            if (container == null) {
+                throw e;
+            }
+            throw new AssertionError(
+                    e.getMessage() + System.lineSeparator() + "Logs del servicio:" + System.lineSeparator()
+                            + logsOf(container),
+                    e);
         } finally {
             if (container != null) {
                 docker("rm", "--force", container);
