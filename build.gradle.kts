@@ -83,6 +83,10 @@ subprojects {
     tasks.named<Test>("test") {
         useJUnitPlatform()
         finalizedBy(tasks.named("jacocoTestReport"))
+        // El mensaje entero de una prueba que falla, para que el log del CI diga por qué sin bajar el reporte.
+        testLogging {
+            exceptionFormat = org.gradle.api.tasks.testing.logging.TestExceptionFormat.FULL
+        }
     }
 
     tasks.named<JacocoReport>("jacocoTestReport") {
