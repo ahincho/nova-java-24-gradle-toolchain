@@ -243,7 +243,7 @@ código que genera no pasa por `-Werror` ni por Checkstyle, porque no lo escribi
 
 ## Migrar a la 2.0.0
 
-La 2.0.0 trae `nova-api-standard-spring-boot-starter` 3.0.0, que responde los errores con el modelo
+La 2.0.0 trae `nova-api-standard-spring-boot-starter` 3.0.1, que responde los errores con el modelo
 por capas de
 [ADR-031](https://github.com/ahincho/nova-shared-01-docs/blob/main/adrs/shared/ADR-031-modulo-de-errores-por-capas-con-trazabilidad.md).
 Los plugins de calidad y de librerías no cambian; el de servicios cambia lo que un cliente recibe ante
@@ -260,7 +260,7 @@ un error. Lo que hay que revisar en un servicio:
 La receta completa, con los puertos que una organización puede reemplazar, está en
 [«Migrating to 3.0.0»](https://github.com/ahincho/nova-java-08-commons-spring-boot-starter#migrating-to-300)
 del starter. `nova-mask-spring-boot-starter` pasa a la 3.0.0 solo porque sale con la misma versión: no
-cambia nada para quien lo usa.
+cambia nada para quien lo usa. La 3.0.1 de los dos registra el sobre para la imagen nativa.
 
 ## Desarrollo
 
