@@ -154,7 +154,8 @@ class NovaNativeImageFunctionalTest {
                     .as("el servicio nativo responde /actuator/health en 30 s")
                     .isTrue();
             HttpResponse<String> greeting = get(address + "/greetings?name=Angel");
-            assertThat(greeting.statusCode()).as("status de /greetings, con el cuerpo %s", greeting.body())
+            assertThat(greeting.statusCode())
+                    .as("status de /greetings, con el cuerpo %s", greeting.body())
                     .isEqualTo(200);
             assertThat(greeting.body()).contains("Hola, Angel");
         } catch (AssertionError e) {
