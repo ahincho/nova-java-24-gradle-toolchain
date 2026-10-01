@@ -150,7 +150,12 @@ class NovaNativeImageFunctionalTest {
                             .findFirst()
                             .orElseThrow();
 
-            assertThat(awaitHealthy(address)).isTrue();
+            // Si no arranca, el contenedor se borra en el finally: sus logs tienen que ir en el mensaje.
+            String started = container;
+            assertThat(awaitHealthy(address))
+                    .as(() -> "el servicio nativo no respondió en 30 s; sus logs:" + System.lineSeparator()
+                            + logsOf(started))
+                    .isTrue();
             HttpResponse<String> greeting = get(address + "/greetings?name=Angel");
             assertThat(greeting.statusCode()).isEqualTo(200);
             assertThat(greeting.body()).contains("Hola, Angel");
@@ -175,6 +180,17 @@ class NovaNativeImageFunctionalTest {
             Thread.sleep(100);
         }
         return false;
+    }
+
+    private static String logsOf(String container) {
+        try {
+            return dockerOutput("logs", container);
+        } catch (IOException e) {
+            return "no se pudieron leer: " + e.getMessage();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return "no se pudieron leer: se interrumpió la lectura";
+        }
     }
 
     private static HttpResponse<String> get(String url) throws IOException, InterruptedException {
