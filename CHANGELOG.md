@@ -1,5 +1,21 @@
 # Changelog
 
+## [2.0.0](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v1.3.1...v2.0.0) (2026-10-01)
+
+
+### ⚠ BREAKING CHANGES
+
+* nova-api-standard-spring-boot-starter 3.0.0 changes the error responses of every service. The README has the recipe.
+
+### Features
+
+* bring the 3.0.0 starters with the layered errors of ADR-031 ([afdf53e](https://github.com/ahincho/nova-java-24-gradle-toolchain/commit/afdf53ee593dac5bbf9adc48017f45c01ac66f4f))
+
+
+### Bug Fixes
+
+* **deps:** bring the 3.0.1 starters that work in a native image ([209620f](https://github.com/ahincho/nova-java-24-gradle-toolchain/commit/209620fb111088c9b7232b84f080b9b3f6221028))
+
 ## [1.3.1](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v1.3.0...v1.3.1) (2026-09-30)
 
 
