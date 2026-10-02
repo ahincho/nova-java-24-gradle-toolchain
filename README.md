@@ -245,6 +245,24 @@ construye siempre con `novaDockerNative`.
 Con el modo nativo, el procesamiento AOT arranca la aplicación al compilar para preparar sus beans, y el
 código que genera no pasa por `-Werror` ni por Checkstyle, porque no lo escribió nadie del equipo.
 
+## Migrar a la 3.0.0
+
+La 3.0.0 trae `nova-mask-spring-boot-starter` 4.0.0, que enmascara solo lo que lleva `@Masked` o
+está en una clase con `@MaskedClass`. Hasta la 2.1.0 un servicio enmascaraba también por el nombre
+del campo, en toda respuesta: el `name` de un producto salía como `T***`. Los plugins de calidad y
+de librerías no cambian.
+
+| Antes (2.x) | Desde la 3.0.0 | Qué hacer |
+|---|---|---|
+| un `name`, `email` o `dni` sin anotación salía enmascarado | sale tal cual | anotar con `@Masked` los campos que son datos personales |
+| una prueba comparaba contra un valor como `T***` | el valor sale en claro | comparar contra el valor, o anotar el campo |
+
+Quien necesite el comportamiento anterior lo enciende con `nova.mask.infer-by-field-name: true`. La
+receta completa está en
+[«Migrating to 4.0.0»](https://github.com/ahincho/nova-java-08-commons-spring-boot-starter#migrating-to-400)
+del starter. `nova-api-standard-spring-boot-starter` pasa a la 4.0.0 solo porque sale con la misma
+versión: no cambia nada para quien lo usa.
+
 ## Migrar a la 2.0.0
 
 La 2.0.0 trae `nova-api-standard-spring-boot-starter` 3.0.1, que responde los errores con el modelo

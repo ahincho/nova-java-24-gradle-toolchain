@@ -29,9 +29,10 @@ native-build-tools = "0.11.5"
 # Cuando Spring Boot los traiga, se borran junto con sus restricciones en el plugin de servicios.
 tomcat = "11.0.26"
 jackson = "3.1.7"
-nova-mask-spring-boot-starter = "3.0.1"
-# La 3.0.0 responde los errores con el modelo por capas de ADR-031; la 3.0.1 funciona en una imagen nativa.
-nova-api-standard-spring-boot-starter = "3.0.1"
+# La 4.0.0 de la máscara enmascara solo lo anotado. El estándar de API sale con la misma versión porque los
+# dos starters comparten repositorio; responde los errores con ADR-031 desde la 3.0.0.
+nova-mask-spring-boot-starter = "4.0.0"
+nova-api-standard-spring-boot-starter = "4.0.0"
 
 [libraries]
 spotless-plugin = { module = "com.diffplug.spotless:spotless-plugin-gradle", version.ref = "spotless" }
