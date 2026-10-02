@@ -15,7 +15,7 @@ junit = "6.0.3"
 assertj = "3.27.7"
 testcontainers = "2.0.5"
 archunit = "1.5.1"
-nova-architecture-rules = "1.1.2"
+nova-architecture-rules = "1.2.0"
 # Correcciones de seguridad del classpath del plugin: Spotless y OWASP arrastran versiones con CVE.
 httpclient5 = "5.6.4"
 httpcore5 = "5.4.4"
