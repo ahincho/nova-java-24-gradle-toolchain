@@ -1,5 +1,16 @@
 # Changelog
 
+## [3.0.0](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v2.1.0...v3.0.0) (2026-10-02)
+
+
+### ⚠ BREAKING CHANGES
+
+* a service built with the spring-boot-service plugin no longer masks a field by its name alone. Annotate personal data with @Masked, or set nova.mask.infer-by-field-name to true. The README has the recipe under Migrar a la 3.0.0.
+
+### Features
+
+* bring the mask starter 4.0.0, which masks only what is annotated ([08b3faf](https://github.com/ahincho/nova-java-24-gradle-toolchain/commit/08b3faf746e8036367b9633ecd4dc0ac739c5540))
+
 ## [2.1.0](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v2.0.0...v2.1.0) (2026-10-02)
 
 
