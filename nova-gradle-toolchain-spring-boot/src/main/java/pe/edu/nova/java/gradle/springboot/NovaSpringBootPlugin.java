@@ -20,9 +20,9 @@ import pe.edu.nova.java.gradle.quality.NovaVersions;
  * {@code pe.edu.nova.java.spring-boot-service}: un servicio Spring Boot de Nova (ADR-044).
  *
  * <p>Aplica {@code pe.edu.nova.java.quality} y encima Spring Boot con su BOM, los starters de máscara y
- * estándar de API de Nova, las pruebas de Spring con las reglas de arquitectura, OWASP con el SBOM y
- * la imagen del contenedor. Reemplaza al plugin {@code pe.edu.nova.java.spring-boot} del repositorio
- * 16, que no se puede publicar desde aquí.
+ * estándar de API de Nova, las pruebas de Spring con MockMvc y las reglas de arquitectura, OWASP con el
+ * SBOM y la imagen del contenedor. Reemplaza al plugin {@code pe.edu.nova.java.spring-boot} del
+ * repositorio 16, que no se puede publicar desde aquí.
  *
  * <p>Con {@code nova.native=true} en {@code gradle.properties}, suma el modo nativo de ADR-045: GraalVM
  * Native Build Tools, el procesamiento AOT de Spring y la imagen nativa.
@@ -62,6 +62,9 @@ public class NovaSpringBootPlugin implements Plugin<Project> {
                 "pe.edu.nova.java.starters:nova-api-standard-spring-boot-starter:"
                         + versions.of("nova.api.standard.spring.boot.starter"));
         dependencies.add(testImplementation, "org.springframework.boot:spring-boot-starter-test");
+        // Desde Spring Boot 4, MockMvc y @AutoConfigureMockMvc viven en este starter y spring-boot-starter-test ya
+        // no los trae. Un servicio con pruebas web lo declaraba a mano; la versión la maneja el BOM de Spring Boot.
+        dependencies.add(testImplementation, "org.springframework.boot:spring-boot-starter-webmvc-test");
         dependencies.add(testImplementation, "pe.edu.nova.java.libs:nova-architecture-rules");
 
         project.getExtensions()

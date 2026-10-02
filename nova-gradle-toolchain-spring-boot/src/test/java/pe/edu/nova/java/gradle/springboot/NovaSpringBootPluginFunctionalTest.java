@@ -54,6 +54,23 @@ class NovaSpringBootPluginFunctionalTest {
     }
 
     @Test
+    void itBringsTheTestStartersThatAMockMvcTestNeeds() {
+        write("build.gradle.kts", PLUGINS + """
+
+                // Se imprime al configurar: una tarea que lo hiciera no sería compatible con el configuration cache.
+                val declared = configurations.getByName("testImplementation").dependencies.map { "${it.group}:${it.name}" }
+                println("TEST_DEPENDENCIES=$declared")
+                """);
+
+        BuildResult result = run("help");
+
+        assertThat(result.getOutput())
+                .contains("org.springframework.boot:spring-boot-starter-test")
+                .contains("org.springframework.boot:spring-boot-starter-webmvc-test")
+                .contains("pe.edu.nova.java.libs:nova-architecture-rules");
+    }
+
+    @Test
     void itPinsTheSecurityPatchesThatSpringBootDoesNotBringYet() {
         write("build.gradle.kts", PLUGINS + """
 
@@ -110,19 +127,7 @@ class NovaSpringBootPluginFunctionalTest {
                     implementation("org.springframework.boot:spring-boot-starter")
                 }
                 """);
-        write("src/main/java/sample/SampleApplication.java", """
-                package sample;
-
-                import org.springframework.boot.SpringApplication;
-                import org.springframework.boot.autoconfigure.SpringBootApplication;
-
-                @SpringBootApplication
-                public class SampleApplication {
-                    public static void main(String[] args) {
-                        SpringApplication.run(SampleApplication.class, args);
-                    }
-                }
-                """);
+        writeSampleApplication();
         write("src/main/java/sample/Greeter.java", """
                 package sample;
 
@@ -167,6 +172,68 @@ class NovaSpringBootPluginFunctionalTest {
         } finally {
             docker("rmi", "--force", image);
         }
+    }
+
+    /**
+     * Un servicio con una prueba web, que no declara ningún starter de pruebas: {@code @WebMvcTest} y MockMvc salen
+     * de {@code spring-boot-starter-webmvc-test}, que trae el plugin. Resuelve los starters de Nova desde GitHub
+     * Packages, así que necesita un token.
+     */
+    @Test
+    void aServiceRunsAMockMvcTestWithoutDeclaringTheStarter() {
+        assumeTrue(System.getenv("GITHUB_TOKEN") != null, "GITHUB_TOKEN is needed to read the Nova packages");
+        write("build.gradle.kts", PLUGINS + """
+
+                dependencies {
+                    implementation("org.springframework.boot:spring-boot-starter")
+                }
+                """);
+        writeSampleApplication();
+        write("src/test/java/sample/SampleWebTest.java", """
+                package sample;
+
+                import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+                import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+                import org.junit.jupiter.api.Test;
+                import org.springframework.beans.factory.annotation.Autowired;
+                import org.springframework.boot.webmvc.test.autoconfigure.WebMvcTest;
+                import org.springframework.test.web.servlet.MockMvc;
+
+                @WebMvcTest
+                class SampleWebTest {
+                    @Autowired
+                    private MockMvc mvc;
+
+                    @Test
+                    void anUnknownPathIsNotFound() throws Exception {
+                        mvc.perform(get("/nowhere")).andExpect(status().isNotFound());
+                    }
+                }
+                """);
+
+        BuildResult result = run("test");
+
+        assertThat(result.task(":test").getOutcome()).isEqualTo(TaskOutcome.SUCCESS);
+        // La prueba corrió de verdad: sin el starter ni siquiera compila.
+        assertThat(read("build/test-results/test/TEST-sample.SampleWebTest.xml"))
+                .contains("tests=\"1\"");
+    }
+
+    private void writeSampleApplication() {
+        write("src/main/java/sample/SampleApplication.java", """
+                package sample;
+
+                import org.springframework.boot.SpringApplication;
+                import org.springframework.boot.autoconfigure.SpringBootApplication;
+
+                @SpringBootApplication
+                public class SampleApplication {
+                    public static void main(String[] args) {
+                        SpringApplication.run(SampleApplication.class, args);
+                    }
+                }
+                """);
     }
 
     private BuildResult run(String... arguments) {

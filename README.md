@@ -113,6 +113,10 @@ Para las pruebas, el plugin trae JUnit, AssertJ y las versiones de Testcontainer
 `nova-architecture-rules`. Un servicio escribe
 `testImplementation("org.testcontainers:testcontainers-postgresql")`, sin versión.
 
+El plugin de servicios de Spring Boot suma además `spring-boot-starter-test` y
+`spring-boot-starter-webmvc-test`, que desde Spring Boot 4 es donde viven MockMvc y `@WebMvcTest`, y
+las reglas de `nova-architecture-rules`. Un servicio con pruebas web no declara ninguno de los tres.
+
 ## Lo que no se puede perder
 
 Una bandera que falta no avisa: deja el análisis a medias y en verde. Por eso el plugin fija lo que
