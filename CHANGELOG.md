@@ -1,5 +1,13 @@
 # Changelog
 
+## [2.1.0](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v2.0.0...v2.1.0) (2026-10-02)
+
+
+### Features
+
+* bring nova-architecture-rules 1.2.0 to every service ([638159c](https://github.com/ahincho/nova-java-24-gradle-toolchain/commit/638159c4b2f2723264c18b5565b61c123a234b46))
+* bring the MockMvc test starter to every Spring Boot service ([36f8b7e](https://github.com/ahincho/nova-java-24-gradle-toolchain/commit/36f8b7e730f7d07335db741eeacac383185ac640))
+
 ## [2.0.0](https://github.com/ahincho/nova-java-24-gradle-toolchain/compare/v1.3.1...v2.0.0) (2026-10-01)
 
 
